@@ -39,16 +39,16 @@ public class AdminDbRepos
         };
     }
 
-    public async Task<ResponseItemDto<GstUsrInfoAllDto>> SeedAsync(int nrOfItems)
+    public async Task<ResponseItemDto<GstUsrInfoAllDto>> SeedAsync(int nrOfAttractions, int nrAddress)
     {
         try 
         {
             await RemoveSeedAsync(true);
 
         var rnd = new csSeedGenerator();
-        var at = rnd.ItemsToList<AttractionDbM>(nrOfItems);
-        var ad = rnd.ItemsToList<AddressDbM>(nrOfItems);
-        var comments = rnd.ItemsToList<CommentDbM>(rnd.Next(nrOfItems, 20*nrOfItems));
+        var at = rnd.ItemsToList<AttractionDbM>(nrOfAttractions);
+        var ad = rnd.ItemsToList<AddressDbM>(nrAddress);
+        var comments = rnd.ItemsToList<CommentDbM>(rnd.Next(nrOfAttractions, 20*nrOfAttractions));
 
         var i = 0;
 
@@ -56,7 +56,7 @@ public class AdminDbRepos
 
         foreach (var item in at){
             item.CategoryDbM = rnd.FromList(allCategories);
-            item.AddressDbM = ad[i];
+            item.AddressDbM = rnd.FromList(ad);
             item.CommentsDbM = rnd.UniqueIndexPickedFromList<CommentDbM>(rnd.Next(0,21), comments);
             i++;
         }

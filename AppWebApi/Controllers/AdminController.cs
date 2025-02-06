@@ -54,14 +54,18 @@ namespace AppWebApi.Controllers
         [HttpGet()]
         [ProducesResponseType(200, Type = typeof(ResponseItemDto<GstUsrInfoAllDto>))]
         [ProducesResponseType(400, Type = typeof(string))]
-        public async Task<IActionResult> Seed(string count = "10")
+       public async Task<IActionResult> Seed(string nrAttractions = "1000", string nrAdresses = "100")
         {
             try
             {
-                int countArg = int.Parse(count);
+                if (!int.TryParse(nrAttractions, out int countArgAtt) || !int.TryParse(nrAdresses, out int countArgAdd))
+                    return BadRequest("Invalid input: nrAttractions and nrAdresses must be numbers.");
 
-                _logger.LogInformation($"{nameof(Seed)}: {nameof(countArg)}: {countArg}");
-                var info = await _adminService.SeedAsync(countArg);
+                if (countArgAtt < 1000 || countArgAdd < 100)
+                    return BadRequest("Values too low: nrAttractions must be at least 1000, and nrAdresses must be at least 100.");
+
+                _logger.LogInformation($"{nameof(Seed)}: {nameof(countArgAtt)}: {countArgAtt}, {nameof(countArgAdd)}: {countArgAdd}");
+                var info = await _adminService.SeedAsync(countArgAtt, countArgAdd);
                 return Ok(info);
             }
             catch (Exception ex)
