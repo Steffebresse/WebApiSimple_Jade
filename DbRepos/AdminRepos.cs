@@ -51,9 +51,11 @@ public class AdminDbRepos
         var comments = rnd.ItemsToList<CommentDbM>(rnd.Next(nrOfItems, 20*nrOfItems));
 
         var i = 0;
-        
+
+        var allCategories = await SeedEachCategoryAsync();
+
         foreach (var item in at){
-            item.CategoryDbM = new CategoryDbM(rnd);
+            item.CategoryDbM = rnd.FromList(allCategories);
             item.AddressDbM = ad[i];
             item.CommentsDbM = rnd.UniqueIndexPickedFromList<CommentDbM>(rnd.Next(0,21), comments);
             i++;
@@ -156,4 +158,25 @@ public class AdminDbRepos
 
             return _info;
     }
+
+    public async Task<List<CategoryDbM>> SeedEachCategoryAsync(){
+
+        var allCategories = new List<CategoryDbM>();
+
+        foreach (CategoryNames category in Enum.GetValues(typeof(CategoryNames)))
+        {
+            CategoryDbM cat = new();
+            cat.CategoryId = Guid.NewGuid();
+            cat.Name = category;
+            cat.Seeded = true;
+            
+            allCategories.Add(cat);
+        }
+
+        await _dbContext.Catgeories.AddRangeAsync(allCategories);
+
+        return allCategories;
+
+    }
+
 }
